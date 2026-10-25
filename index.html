@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Pi Lab — Raspberry Pi circuit simulator</title>
+<meta name="description" content="Wire a Raspberry Pi 4, 5 or Zero 2 W to 1,000+ real parts on a breadboard, run real Python (RPi.GPIO, gpiozero, smbus2, spidev) in your browser and see LEDs, servos, motors, displays and buzzers react — with electrical checks that catch mistakes before they cost you a Pi.">
+<meta property="og:title" content="Pi Lab — Raspberry Pi circuit simulator">
+<meta property="og:description" content="Pi 4 / Pi 5 / Zero 2 W, breadboard, 1,000+ parts, real Python in the browser, electrical checks.">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pi Lab">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="styles.css">
+<script src="js/boot.js"></script>
+</head>
+<body>
+<header id="top">
+  <div class="brand"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5" fill="#16a34a"/><g fill="#facc15"><circle cx="6" cy="8" r="1"/><circle cx="9" cy="8" r="1"/><circle cx="12" cy="8" r="1"/><circle cx="15" cy="8" r="1"/><circle cx="18" cy="8" r="1"/></g><rect x="9" y="11" width="6" height="5" rx="1" fill="#0f172a"/></svg><b>Pi Lab</b></div>
+  <select id="board" title="Raspberry Pi model" aria-label="Raspberry Pi model"></select>
+  <div class="tb">
+    <button id="bMenu" class="btn icon" title="Menu" aria-label="Menu">☰</button><button id="bExamples" class="btn" title="Example projects">Examples</button>
+    <button id="bFile" class="btn" title="New, save, open, export, import">File</button>
+    <button id="bUndo" class="btn icon" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+    <button id="bRedo" class="btn icon" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
+    <button id="bFit" class="btn icon" title="Fit circuit to screen" aria-label="Fit to screen">⤢</button>
+  </div>
+  <div class="spacer"></div>
+  <button id="bChecks" class="btn chk" title="Electrical checks"><span id="chkIcon">✓</span> <span id="chkText">Checks</span></button>
+  <button id="bRun" class="btn run" title="Run main.py (Ctrl+Enter)">▶ Run</button>
+  <button id="bStop" class="btn stop" title="Stop the program" hidden>■ Stop</button>
+</header>
+<main id="app">
+  <aside id="lib" class="panel">
+    <div class="phead"><input id="q" type="search" placeholder="Search 1,000+ parts — e.g. DHT22, 220Ω, servo" aria-label="Search parts" autocomplete="off"><div id="cats" class="chips"></div></div>
+    <div id="libCount" class="muted small"></div>
+    <div id="libList" class="list"></div>
+  </aside>
+  <section id="stage">
+    <svg id="svg" xmlns="http://www.w3.org/2000/svg" aria-label="Circuit canvas">
+      <defs>
+        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r=".7" fill="#cbd5e1"/></pattern>
+        <filter id="glowf" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <g id="world"><rect id="gridRect" x="-5000" y="-5000" width="10000" height="10000" fill="url(#grid)"/><g id="lBoards"></g><g id="lComps"></g><g id="lWires"></g><g id="lOver"></g></g>
+    </svg>
+    <div id="hint" class="hint" hidden></div>
+    <div id="zoomCtl"><button id="zIn" class="btn icon" aria-label="Zoom in">+</button><button id="zOut" class="btn icon" aria-label="Zoom out">−</button></div>
+    <div id="toast" class="toast" hidden></div>
+  </section>
+  <aside id="side" class="panel">
+    <nav id="tabs"><button data-tab="inspect" class="on">Inspector</button><button data-tab="code">Code</button><button data-tab="checks">Checks <span id="chkCount" class="pill" hidden>0</span></button></nav>
+    <div id="pInspect" class="tabp on"></div>
+    <div id="pCode" class="tabp">
+      <div class="codebar"><span class="muted small">main.py</span><span class="spacer"></span><span id="pyState" class="small muted">Python loads on first Run</span></div>
+      <div id="editor"><pre id="gutter" aria-hidden="true">1</pre><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Python code"></textarea></div>
+      <div class="small muted libs">Libraries: RPi.GPIO · gpiozero · smbus2 · spidev · pyserial · RPLCD · I2C_LCD_driver · adafruit_ssd1306 · adafruit_dht · Adafruit_DHT · w1thermsensor · neopixel · rpi_ws281x · mfrc522 · tm1637 · mpu6050 · bme280 · hx711 · adafruit_servokit · Adafruit_ADS1x15 · adafruit_ads1x15 · board/busio/digitalio</div>
+    </div>
+    <div id="pChecks" class="tabp"></div>
+  </aside>
+  <section id="console">
+    <div class="conhead"><b>Console</b><span class="muted small" id="runStatus">idle</span><span class="spacer"></span><button id="bClear" class="btn small">Clear</button></div>
+    <div id="out" role="log" aria-live="polite"></div>
+    <form id="inForm" hidden><span>›</span><input id="inLine" autocomplete="off" aria-label="Program input"><button class="btn small">Send</button></form>
+  </section>
+</main>
+<nav id="mtabs"><button data-m="lib">Parts</button><button data-m="inspect">Inspect</button><button data-m="code">Code</button><button data-m="console">Console</button><button data-m="checks">Checks <span id="mChk" class="pill" hidden>0</span></button></nav>
+<div id="menu" class="menu" hidden></div>
+<div id="modal" class="modal" hidden><div class="mbox"><div id="mbody"></div></div></div>
+<input id="fileIn" type="file" accept=".json,application/json" hidden>
+<noscript>Pi Lab needs JavaScript.</noscript>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
