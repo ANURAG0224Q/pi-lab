@@ -1,3 +1,16 @@
+// GitHub Pages copy: the Python runtime's .wasm is stored as gzip parts (repository upload size limit).
+// Rebuild it here, inside the worker, whenever Pyodide asks for pyodide.asm.wasm.
+const WASM_PARTS = ["pyodide.asm.wasm.gz.0", "pyodide.asm.wasm.gz.1"];
+const _pilabFetch = self.fetch.bind(self);
+self.fetch = async (input, init) => {
+  const url = typeof input === 'string' ? input : (input && input.url) || String(input);
+  if (/pyodide\.asm\.wasm([?#]|$)/.test(url)) {
+    const bufs = await Promise.all(WASM_PARTS.map((p) => _pilabFetch(new URL(p, url).href).then((r) => { if (!r.ok) throw new Error('Python runtime part ' + p + ': HTTP ' + r.status); return r.arrayBuffer(); })));
+    const body = new Blob(bufs).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Response(body, { status: 200, headers: { 'Content-Type': 'application/wasm' } });
+  }
+  return _pilabFetch(input, init);
+};
 // Python runtime worker: Pyodide + shim modules that talk to the simulator synchronously
 // through SharedArrayBuffer + Atomics (so time.sleep, loops and input() behave like on a real Pi).
 let pyodide = null, ctl, data, pins, intr;

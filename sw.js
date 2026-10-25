@@ -2,7 +2,7 @@
 // (COOP/COEP) on every response so Python's shared memory works on any static host, including sub-paths.
 const VERSION = 'd2d1652d2400';
 const SHELL = ["", "icon.svg", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "js/app.js", "js/audio.js", "js/boot.js", "js/bus.js", "js/catalog.js", "js/chips.js", "js/devices.js", "js/examples.js", "js/geom.js", "js/i2cchips.js", "js/pi.js", "js/py-worker.js", "js/pybridge.js", "js/pyshims.js", "js/render.js", "js/sim.js", "js/solver.js", "manifest.webmanifest", "styles.css"];
-const PYODIDE = ["pyodide/pyodide-lock.json", "pyodide/pyodide.asm.js", "pyodide/pyodide.asm.wasm", "pyodide/pyodide.js", "pyodide/python_stdlib.zip"];
+const PYODIDE = ["pyodide/pyodide-lock.json", "pyodide/pyodide.asm.js", "pyodide/pyodide.asm.wasm.gz.0", "pyodide/pyodide.asm.wasm.gz.1", "pyodide/pyodide.js", "pyodide/python_stdlib.zip"];
 const CACHE = 'pilab-' + VERSION;
 const scopeURL = new URL('./', self.location).href;
 self.addEventListener('install', (e) => {
