@@ -1,5 +1,7 @@
 # Pi Lab
 
+> **Note:** This project was made by AI for educational purposes. It was not made by me (ANURAG).
+
 A Raspberry Pi circuit simulator that runs entirely in your browser.
 
 **Open it:** https://anurag0224q.github.io/pi-lab/
